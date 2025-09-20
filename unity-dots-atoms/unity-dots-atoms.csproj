@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')"/>
+    <PropertyGroup>
+        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+        <ProjectGuid>{466E1F68-67C5-4925-8546-3E469B12D7E1}</ProjectGuid>
+        <OutputType>Library</OutputType>
+        <AppDesignerFolder>Properties</AppDesignerFolder>
+        <RootNamespace>DotsAtoms</RootNamespace>
+        <AssemblyName>unity-dots-atoms</AssemblyName>
+        <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+        <FileAlignment>512</FileAlignment>
+        <LangVersion>8</LangVersion>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <Optimize>false</Optimize>
+        <OutputPath>bin\Debug\</OutputPath>
+        <DefineConstants>DEBUG;TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugType>pdbonly</DebugType>
+        <Optimize>true</Optimize>
+        <OutputPath>bin\Release\</OutputPath>
+        <DefineConstants>TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+    <ItemGroup>
+        <Reference Include="System"/>
+        <Reference Include="System.Core"/>
+        <Reference Include="System.Xml"/>
+        <Reference Include="UnityEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+            <HintPath>..\..\..\..\..\..\Applications\Unity\Hub\Editor\2020.3.30f1\Unity.app\Contents\Managed\UnityEditor.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine">
+            <HintPath>/Applications/Unity/Hub/Editor/2020.3.30f1/Unity.app/Contents/Managed/UnityEngine.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Include="Package\Runtime\GameObjectViews\Authoring\GameObjectView.cs" />
+        <Compile Include="Package\Runtime\GameObjectViews\Authoring\GameObjectViewPrefab.cs" />
+        <Compile Include="Package\Runtime\GameObjectViews\Data\DoDestroyAtEndOfFrame.cs" />
+        <Compile Include="Package\Runtime\GameObjectViews\Data\GameObjectView.cs" />
+        <Compile Include="Package\Runtime\GameObjectViews\Data\GameObjectViewInterface.cs" />
+        <Compile Include="Package\Runtime\GameObjectViews\Systems\DestroyEntitiesAtEndOfFrame.cs" />
+        <Compile Include="Package\Runtime\GameObjectViews\Systems\DestroyGameObjectViews.cs" />
+        <Compile Include="Package\Runtime\GameObjectViews\Systems\InstantiateGameObjectViews.cs" />
+        <Compile Include="Package\Runtime\GameObjectViews\Systems\UpdateGameObjectViewTransforms.cs" />
+        <Compile Include="Package\Runtime\DotsAtoms.cs" />
+        <Compile Include="Package\Utils\IEnumerable+ForEach.cs"/>
+        <Compile Include="Package\Utils\DotsAtoms.Utils.cs" />
+        <Compile Include="Package\Utils\String+RichText.cs"/>
+        <Compile Include="Properties\AssemblyInfo.cs"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Content Include="..\LICENSE">
+          <Link>LICENSE</Link>
+        </Content>
+        <Content Include="..\Readme.md">
+          <Link>Readme.md</Link>
+        </Content>
+        <Content Include="Package\Editor\DotsAtoms.Editor.asmdef" />
+        <Content Include="Package\package.json"/>
+        <Content Include="Package\Runtime\GameObjectViews\Authoring\GameObjectView.cs.meta" />
+        <Content Include="Package\Runtime\GameObjectViews\Authoring\GameObjectViewPrefab.cs.meta" />
+        <Content Include="Package\Runtime\GameObjectViews\Data\DoDestroyAtEndOfFrame.cs.meta" />
+        <Content Include="Package\Runtime\GameObjectViews\Data\GameObjectView.cs.meta" />
+        <Content Include="Package\Runtime\GameObjectViews\Data\GameObjectViewInterface.cs.meta" />
+        <Content Include="Package\Runtime\GameObjectViews\DotsAtoms.GameObjectViews.asmdef" />
+        <Content Include="Package\Runtime\GameObjectViews\Systems\DestroyEntitiesAtEndOfFrame.cs.meta" />
+        <Content Include="Package\Runtime\GameObjectViews\Systems\DestroyGameObjectViews.cs.meta" />
+        <Content Include="Package\Runtime\GameObjectViews\Systems\InstantiateGameObjectViews.cs.meta" />
+        <Content Include="Package\Runtime\GameObjectViews\Systems\UpdateGameObjectViewTransforms.cs.meta" />
+        <Content Include="Package\Runtime\DotsAtoms.asmdef" />
+        <Content Include="Package\Utils\DotsAtoms.Utils.asmdef" />
+    </ItemGroup>
+    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
+    <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+         Other similar extension points exist, see Microsoft.Common.targets.
+    <Target Name="BeforeBuild">
+    </Target>
+    <Target Name="AfterBuild">
+    </Target>
+    -->
+
+</Project>

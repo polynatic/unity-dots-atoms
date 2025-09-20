@@ -1,0 +1,17 @@
+{
+  "name": "com.polynatic.unity-dots-atoms",
+  "version": "0.0.1",
+  "displayName": "DOTS Atoms",
+  "description": "Small composable bits and systems to be used with Unity DOTS.",
+  "unity": "6000.1",
+  "licensesUrl": "https://github.com/polynatic/unity-dots-atoms/blob/main/LICENSE",
+  "dependencies": {},
+  "keywords": [
+    "entities",
+    "dots"
+  ],
+  "author": {
+    "name": "polynatic",
+    "url": "https://www.github.com/polynatic"
+  }
+}
