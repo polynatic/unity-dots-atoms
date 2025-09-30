@@ -18,7 +18,14 @@ namespace DotsAtoms.GameObjectViews.Data
         {
             private UnityObjectRef<GameObject> Reference;
 
-            public Prefab(GameObject gameObject) => Reference = new() { Value = gameObject };
+            // ReSharper disable once InconsistentNaming
+            public readonly bool HasRigidBody;
+
+            public Prefab(GameObject gameObject)
+            {
+                Reference = new() { Value = gameObject };
+                HasRigidBody = gameObject.GetComponent<Rigidbody>();
+            }
 
             [Pure]
             public GameObjectView Instantiate(GameObjectViewContext context) =>
@@ -43,8 +50,14 @@ namespace DotsAtoms.GameObjectViews.Data
         public struct Singleton : IComponentData
         {
             public TransformAccessArray Transforms;
+
             public NativeList<Entity> Entities;
             public UnityObjectRef<GameObjectViewContext> Context;
+
+            /// <summary>
+            /// This map contains all references to views with RigidBodies and the entities from where they update the velocity from.
+            /// </summary>
+            public NativeHashMap<UnityObjectRef<Rigidbody>, Entity> RigidBodies;
         }
     }
 }

@@ -31,17 +31,22 @@ namespace DotsAtoms.GameObjectViews.Systems
             var commands = EcbSystem.CreateCommandBuffer(state.WorldUnmanaged);
             var transforms = singleton.Transforms;
             var entities = singleton.Entities;
+            var rigidBodies = singleton.RigidBodies;
 
-            foreach (var (gameObjectView, entity) in Query<RefRO<GameObjectView>>()
-                                                     .WithNone<GameObjectView.IsAlive>()
-                                                     .WithEntityAccess()
-                    ) {
-                Object.Destroy(gameObjectView.ValueRO.GameObject);
-
+            foreach (
+                var (gameObjectView, entity)
+                in Query<RefRO<GameObjectView>>()
+                   .WithNone<GameObjectView.IsAlive>()
+                   .WithEntityAccess()
+            ) {
                 var index = entities.IndexOf(entity);
                 transforms.RemoveAtSwapBack(index);
                 entities.RemoveAtSwapBack(index);
+
+                rigidBodies.Remove(gameObjectView.ValueRO.GameObject.GetComponent<Rigidbody>());
                 commands.RemoveComponent<GameObjectView>(entity);
+
+                Object.Destroy(gameObjectView.ValueRO.GameObject);
             }
         }
     }

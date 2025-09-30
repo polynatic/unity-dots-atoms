@@ -1,7 +1,9 @@
 using DotsAtoms.GameObjectViews.Data;
+using Extensions.Entities;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Physics;
 using Unity.Rendering;
 using Unity.Transforms;
 using UnityEngine.Jobs;
@@ -15,27 +17,27 @@ namespace DotsAtoms.GameObjectViews.Systems
     public partial struct GameObjectViewUpdateTransforms : ISystem
     {
         private GameObjectView.Singleton GameObjectViewSingleton;
-        private ComponentLookup<LocalToWorld> TypeHandleLocalTransform;
+        private ComponentLookup<LocalToWorld> LookupLocalTransform;
 
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<GameObjectView.Singleton>();
 
+            LookupLocalTransform.UseSystemStateReadOnly(ref state);
+
             TryGetSingleton(out GameObjectViewSingleton);
-            TypeHandleLocalTransform = GetComponentLookup<LocalToWorld>(isReadOnly: true);
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            TypeHandleLocalTransform.Update(ref state);
+            LookupLocalTransform.Update(ref state);
+
             state.Dependency = new Job {
-                    LookupLocalToWorld = TypeHandleLocalTransform,
+                    LookupLocalToWorld = LookupLocalTransform,
                     Entities = GameObjectViewSingleton.Entities,
                 }
                 .Schedule(GameObjectViewSingleton.Transforms, state.Dependency);
-
-            state.Dependency.Complete();
         }
 
         [BurstCompile]

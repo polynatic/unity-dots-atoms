@@ -6,6 +6,7 @@ using Unity.Entities;
 using Unity.Transforms;
 using UnityEngine;
 using static Unity.Entities.SystemAPI;
+using Hash128 = Unity.Entities.Hash128;
 
 namespace DotsAtoms.GameObjectViews.Systems
 {
@@ -34,8 +35,9 @@ namespace DotsAtoms.GameObjectViews.Systems
             }
 
             GameObjectViewSingleton = new() {
-                Transforms = new(100),
+                Transforms = new(128),
                 Entities = new(Allocator.Persistent),
+                RigidBodies = new(128, Allocator.Persistent),
                 Context = context,
             };
 
@@ -56,19 +58,31 @@ namespace DotsAtoms.GameObjectViews.Systems
             var commands = EcbSystem.CreateCommandBuffer(state.WorldUnmanaged);
             var transforms = GameObjectViewSingleton.Transforms;
             var entities = GameObjectViewSingleton.Entities;
+            var rigidBodies = GameObjectViewSingleton.RigidBodies;
             var context = GameObjectViewSingleton.Context.Value;
 
-            foreach (var (gameObjectView, entity) in Query<RefRO<GameObjectView.Prefab>>()
-                                                     .WithNone<GameObjectView>()
-                                                     .WithEntityAccess()) {
+            foreach (
+                var (gameObjectView, entity)
+                in Query<RefRO<GameObjectView.Prefab>>()
+                   .WithNone<GameObjectView>()
+                   .WithEntityAccess()
+            ) {
                 var instantiated = gameObjectView.ValueRO.Instantiate(context);
-                transforms.Add(instantiated.GameObject.transform);
+                var gameObject = instantiated.GameObject;
+                var hasRigidBody = gameObjectView.ValueRO.HasRigidBody;
+
+                transforms.Add(gameObject.transform);
                 entities.Add(entity);
+
+                if (hasRigidBody) {
+                    rigidBodies.Add(gameObject.GetComponent<Rigidbody>(), entity);
+                }
+
                 commands.AddComponent(entity, instantiated);
                 commands.AddComponent<GameObjectView.IsAlive>(entity);
                 commands.RemoveComponent<GameObjectView.Prefab>(entity);
 
-                foreach (var view in instantiated.GameObject.GetComponentsInChildren<IGameObjectView>()) {
+                foreach (var view in gameObject.GetComponentsInChildren<IGameObjectView>()) {
                     view.OnGameObjectViewInitialized(state.EntityManager, entity, commands);
                 }
             }
