@@ -8,7 +8,7 @@ namespace DotsAtoms.Lifetime.Systems
 {
     [BurstCompile]
     [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
-    public partial struct InitializeCreatedAtTime : ISystem
+    public partial struct InitializeLifetimeCreatedAt : ISystem
     {
         private EntityQuery Query;
 
