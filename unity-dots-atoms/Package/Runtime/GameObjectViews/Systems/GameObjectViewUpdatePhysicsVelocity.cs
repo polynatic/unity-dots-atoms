@@ -35,10 +35,8 @@ namespace DotsAtoms.GameObjectViews.Systems
 
             state.Dependency.Complete();
 
-            var rigidBodies = GameObjectViewSingleton.RigidBodies;
-
-            foreach (var kv in rigidBodies) {
-                ref var entity = ref kv.Value;
+            foreach (var kv in GameObjectViewSingleton.RigidBodies) {
+                var entity = kv.Value;
                 var rigidBody = kv.Key.Value;
                 var physicsVelocity = LookupPhysicsVelocity[entity];
                 rigidBody.linearVelocity = physicsVelocity.Linear;

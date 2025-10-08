@@ -11,7 +11,8 @@ namespace DotsAtoms.GameObjectViews.Systems
 
 
     [UpdateInGroup(typeof(StructuralChangePresentationSystemGroup))]
-    [UpdateAfter(typeof(GameObjectViewUpdateTransforms))]
+    [UpdateBefore(typeof(GameObjectViewUpdateTransforms))]
+    [UpdateBefore(typeof(GameObjectViewUpdatePhysicsVelocity))]
     [CreateAfter(typeof(GameObjectViewInstantiate))]
     public partial struct GameObjectViewDestroy : ISystem
     {
