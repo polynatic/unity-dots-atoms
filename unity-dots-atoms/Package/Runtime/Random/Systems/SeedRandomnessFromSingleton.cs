@@ -4,6 +4,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using UnityEngine;
+using static Unity.Entities.ComponentType;
 using static Unity.Entities.SystemAPI;
 using EcbSystem = Unity.Entities.EndFixedStepSimulationEntityCommandBufferSystem;
 
@@ -23,10 +24,7 @@ namespace DotsAtoms.Random.Systems
             MakeSureRandomnessSingletonExists(ref state);
 
             Query = new EntityQueryBuilder(Allocator.Temp)
-                    .WithAll<
-                        Randomness,
-                        Randomness.SeedFromSingleton
-                    >()
+                    .WithAll<Randomness.SeedFromSingleton>()
                     .Build(ref state);
 
             EcbSystem = GetSingleton<EcbSystem.Singleton>();
@@ -41,8 +39,8 @@ namespace DotsAtoms.Random.Systems
             if (TryGetSingletonEntity<Randomness.Singleton>(out _)) return;
 
             var entity = state.EntityManager.CreateEntity(
-                ComponentType.ReadWrite<Randomness>(),
-                ComponentType.ReadWrite<Randomness.Singleton>()
+                ReadWrite<Randomness>(),
+                ReadWrite<Randomness.Singleton>()
             );
             var seed = (uint)UnityEngine.Random.Range(int.MinValue, int.MaxValue);
             SetComponent(entity, Randomness.WithSeed(seed));
@@ -63,43 +61,10 @@ namespace DotsAtoms.Random.Systems
             public EntityCommandBuffer Commands;
 
             [BurstCompile]
-            public void Execute(in Entity entity, ref Randomness random)
+            public void Execute(in Entity entity)
             {
-                random = Random.NextRandomness();
+                Commands.AddComponent(entity, Random.NextRandomness());
                 Commands.RemoveComponent<Randomness.SeedFromSingleton>(entity);
-            }
-        }
-    }
-
-
-    public partial struct MyRandomSystem : ISystem
-    {
-        private Randomness.Singleton.Query Randomness; // Store query for singleton
-
-        public void OnCreate(ref SystemState state)
-        {
-            Randomness.UseSystemState(ref state); // Initialize query for singleton
-        }
-
-        [BurstCompile]
-        public void OnUpdate(ref SystemState state)
-        {
-            ref var random = ref Randomness.GetRandomRW(ref state); // Get Random value ref of singleton
-            var randomInt = random.NextInt();
-            
-            
-            // Use "child" randomness to enable jobs, because you can't pass a ref var.
-            // This doesn't work with parallel jobs, because threads would modify the RNG state in unpredictable orders.
-            new MyJob { Random = random.NextRandom() }.Schedule();
-        }
-
-        private partial struct MyJob : IJobEntity
-        {
-            public Unity.Mathematics.Random Random;
-
-            public void Execute(Entity entity)
-            {
-                var randomInt = Random.NextInt();
             }
         }
     }
