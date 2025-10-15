@@ -14,6 +14,12 @@ namespace DotsAtoms.GameObjectViews.Mono
     {
         private IGameObjectView[] ViewComponents = { };
 
+
+        /// <summary>
+        /// The context that instantiated this view.
+        /// </summary>
+        internal GameObjectViewContext Context;
+
         private void Awake()
         {
             ViewComponents = GetComponentsInChildren<IGameObjectView>(includeInactive: true);
@@ -41,8 +47,7 @@ namespace DotsAtoms.GameObjectViews.Mono
         private async UniTaskVoid DestroyAfterTasks(List<UniTask> tasks)
         {
             await tasks;
-            Destroy(gameObject);
-            Debug.Log($"{gameObject.name} destroyed");
+            Context.DestroyView(this);
         }
     }
 }

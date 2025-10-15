@@ -42,7 +42,7 @@ namespace DotsAtoms.GameObjectViews.Data
             private GameObject InstantiateInternal(GameObjectViewContext context)
             {
                 var prefab = Reference.Value.gameObject;
-                var gameObject = context.InstantiatePrefab(prefab);
+                var gameObject = context.InstantiateView(prefab);
 #if UNITY_EDITOR
                 gameObject.name = prefab.name;
 #endif
