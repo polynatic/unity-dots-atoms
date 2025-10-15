@@ -9,9 +9,11 @@ namespace DotsAtoms.GameObjectViews.Data
 {
     public struct GameObjectView : ICleanupComponentData
     {
-        private UnityObjectRef<GameObject> Reference;
+        private UnityObjectRef<GameObject> GameObjectRef;
+        private UnityObjectRef<Mono.GameObjectView> GameObjectViewRef;
 
-        public GameObject GameObject => Reference.Value.gameObject;
+        public GameObject GameObject => GameObjectRef.Value.gameObject;
+        public Mono.GameObjectView View => GameObjectViewRef.Value;
 
 
         public struct Prefab : IComponentData
@@ -28,8 +30,14 @@ namespace DotsAtoms.GameObjectViews.Data
             }
 
             [Pure]
-            public GameObjectView Instantiate(GameObjectViewContext context) =>
-                new() { Reference = InstantiateInternal(context) };
+            public GameObjectView Instantiate(GameObjectViewContext context)
+            {
+                var gameObject = InstantiateInternal(context);
+                return new() {
+                    GameObjectRef = gameObject,
+                    GameObjectViewRef = gameObject.GetComponent<Mono.GameObjectView>(),
+                };
+            }
 
             private GameObject InstantiateInternal(GameObjectViewContext context)
             {

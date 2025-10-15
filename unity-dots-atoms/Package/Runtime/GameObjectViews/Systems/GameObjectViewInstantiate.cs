@@ -1,12 +1,9 @@
 using DotsAtoms.GameObjectViews.Data;
-using DotsAtoms.GameObjectViews.Interfaces;
-using DotsAtoms.GameObjectViews.Mono;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Transforms;
 using UnityEngine;
 using static Unity.Entities.SystemAPI;
-using Hash128 = Unity.Entities.Hash128;
 
 namespace DotsAtoms.GameObjectViews.Systems
 {
@@ -19,15 +16,15 @@ namespace DotsAtoms.GameObjectViews.Systems
     public partial struct GameObjectViewInstantiate : ISystem
     {
         private EcbSystemType.Singleton EcbSystem;
-        private GameObjectView.Singleton GameObjectViewSingleton;
+        private Data.GameObjectView.Singleton GameObjectViewSingleton;
 
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<EcbSystemType.Singleton>();
-            state.RequireForUpdate<GameObjectView.Singleton>();
+            state.RequireForUpdate<Data.GameObjectView.Singleton>();
             EcbSystem = GetSingleton<EcbSystemType.Singleton>();
 
-            var context = Object.FindFirstObjectByType<GameObjectViewContext>();
+            var context = Object.FindFirstObjectByType<Mono.GameObjectViewContext>();
 
             if (context == null) {
                 Debug.LogWarning($"{nameof(GameObjectViewInstantiate)} requires a GameObjectViewContext");
@@ -82,9 +79,7 @@ namespace DotsAtoms.GameObjectViews.Systems
                 commands.AddComponent<GameObjectView.IsAlive>(entity);
                 commands.RemoveComponent<GameObjectView.Prefab>(entity);
 
-                foreach (var view in gameObject.GetComponentsInChildren<IGameObjectView>()) {
-                    view.OnGameObjectViewInitialized(state.EntityManager, entity, commands);
-                }
+                instantiated.View.OnViewAttached(state.EntityManager, entity, commands);
             }
         }
     }

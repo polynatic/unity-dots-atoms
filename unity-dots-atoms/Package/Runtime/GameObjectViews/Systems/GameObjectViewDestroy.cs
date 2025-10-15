@@ -47,7 +47,7 @@ namespace DotsAtoms.GameObjectViews.Systems
                 rigidBodies.Remove(gameObjectView.ValueRO.GameObject.GetComponent<Rigidbody>());
                 commands.RemoveComponent<GameObjectView>(entity);
 
-                Object.Destroy(gameObjectView.ValueRO.GameObject);
+                gameObjectView.ValueRO.View.OnViewDetached(state.EntityManager, entity, commands);
             }
         }
     }
