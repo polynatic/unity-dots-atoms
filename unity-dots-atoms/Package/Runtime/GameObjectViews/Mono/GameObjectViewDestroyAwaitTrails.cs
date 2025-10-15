@@ -1,0 +1,48 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Cysharp.Threading.Tasks;
+using DotsAtoms.GameObjectViews.Interfaces;
+using Unity.Entities;
+using UnityEngine;
+using static Cysharp.Threading.Tasks.UniTask;
+
+namespace DotsAtoms.GameObjectViews.Mono
+{
+    public class GameObjectViewDestroyAwaitTrails : MonoBehaviour, IGameObjectView
+    {
+        private TrailRenderer[] Trails;
+
+        private void Awake()
+        {
+            Trails = GetComponentsInChildren<TrailRenderer>();
+        }
+
+        public void OnViewAttached(EntityManager entityManager, in Entity entity, EntityCommandBuffer commands) { }
+        public void OnViewDetached(EntityManager entityManager, in Entity entity, EntityCommandBuffer commands) { }
+
+        public async UniTask OnViewDestroy()
+        {
+            var tasks = new List<UniTask>(Trails.Length);
+
+            foreach (var trail in Trails) {
+                trail.emitting = false;
+
+                if (trail.positionCount > 0) {
+                    tasks.Add(WaitForTrailToFinish(trail));
+                }
+            }
+
+            if (tasks.Count > 0) {
+                await tasks;
+            }
+        }
+
+        private async UniTask WaitForTrailToFinish(TrailRenderer trail)
+        {
+            while (trail.positionCount > 0) {
+                await NextFrame(cancellationToken: destroyCancellationToken);
+            }
+        }
+    }
+}
