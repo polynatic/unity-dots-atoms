@@ -1,0 +1,35 @@
+{
+  "name": "DotsAtoms.GameObjectViews.Zenject",
+  "rootNamespace": "DotsAtoms.GameObjectViews.Zenject",
+  "references": [
+    "GUID:2665a8d13d1b3f18800f46e256720795",
+    "GUID:734d92eba21c94caba915361bd5ac177",
+    "GUID:8819f35a0fc84499b990e90a4ca1911f",
+    "GUID:e0cd26848372d4e5c891c569017e11f1",
+    "GUID:d8b63aba1907145bea998dd612889d6b",
+    "GUID:a5baed0c9693541a5bd947d336ec7659",
+    "GUID:7a450cf7ca9694b5a8bfa3fd83ec635a",
+    "GUID:63afb046c8423dd448ae7aba042ea63d",
+    "GUID:e0301c53de4e4885ac5b662ae5857419",
+    "GUID:f51ebe6a0ceec4240a699833d6309b23",
+    "GUID:03118a86a841429e824afabe3b67bfee",
+    "Zenject"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [
+    "DOTS_ATOMS_DEPENDENCY_ZENJECT"
+  ],
+  "versionDefines": [
+    {
+      "name": "com.mathijsbakker.extenject",
+      "expression": "9.2.0",
+      "define": "DOTS_ATOMS_DEPENDENCY_ZENJECT"
+    }
+  ],
+  "noEngineReferences": false
+}

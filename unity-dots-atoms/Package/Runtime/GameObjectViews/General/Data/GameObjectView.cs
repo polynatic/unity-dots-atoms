@@ -32,21 +32,21 @@ namespace DotsAtoms.GameObjectViews.Data
             [Pure]
             public GameObjectView Instantiate(GameObjectViewContext context)
             {
-                var gameObject = InstantiateInternal(context);
+                var view = InstantiateInternal(context);
                 return new() {
-                    GameObjectRef = gameObject,
-                    GameObjectViewRef = gameObject.GetComponent<Mono.GameObjectView>(),
+                    GameObjectRef = view.gameObject,
+                    GameObjectViewRef = view,
                 };
             }
 
-            private GameObject InstantiateInternal(GameObjectViewContext context)
+            private Mono.GameObjectView InstantiateInternal(GameObjectViewContext context)
             {
                 var prefab = Reference.Value.gameObject;
-                var gameObject = context.InstantiateView(prefab);
+                var view = context.InstantiateViewInternal(prefab);
 #if UNITY_EDITOR
-                gameObject.name = prefab.name;
+                view.gameObject.name = prefab.name;
 #endif
-                return gameObject;
+                return view;
             }
         }
 

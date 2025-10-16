@@ -38,7 +38,7 @@ namespace DotsAtoms.GameObjectViews.Mono
             var tasks = new List<UniTask>();
             foreach (var view in ViewComponents) {
                 view.OnViewDetached(entityManager, entity, commands);
-                tasks.Add(view.OnViewDestroy());
+                tasks.Add(view.OnViewWillDestroy());
             }
 
             DestroyAfterTasks(tasks).Forget();
@@ -47,6 +47,11 @@ namespace DotsAtoms.GameObjectViews.Mono
         private async UniTaskVoid DestroyAfterTasks(List<UniTask> tasks)
         {
             await tasks;
+
+            foreach (var view in ViewComponents) {
+                view.OnViewDestroyed();
+            }
+
             Context.DestroyView(this);
         }
     }

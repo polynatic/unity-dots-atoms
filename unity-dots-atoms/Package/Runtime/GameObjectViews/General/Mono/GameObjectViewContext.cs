@@ -8,23 +8,27 @@ namespace DotsAtoms.GameObjectViews.Mono
     /// be instantiated. If you need more control over instantiation, for example for pooling or dependency injection,
     /// you can derive from this class, override InstantiateView() and DestroyView() and use this instead.
     /// </summary>
+    [DisallowMultipleComponent]
     public class GameObjectViewContext : MonoBehaviour
     {
         /// <summary>
         /// Instantiate a GameObjectView from a given prefab.
         /// </summary>
-        public virtual GameObject InstantiateView(GameObject prefab)
-        {
-            var instance = Instantiate(prefab);
-            var view = instance.GetComponent<GameObjectView>();
-            view.Context = this;
-            return instance;
-        }
+        public virtual GameObject InstantiateView(GameObject prefab) => Instantiate(prefab);
 
         /// <summary>
         /// Destroy the given GameObjectView.
         /// </summary>
         public virtual void DestroyView(GameObjectView view) => Destroy(view.gameObject);
+
+
+        internal GameObjectView InstantiateViewInternal(GameObject prefab)
+        {
+            var instance = InstantiateView(prefab);
+            var view = instance.GetComponent<GameObjectView>();
+            view.Context = this;
+            return view;
+        }
 
 
         [MenuItem("GameObject/DotsAtoms/GameObjectView Context", false, 10)]

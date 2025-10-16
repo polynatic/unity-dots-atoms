@@ -21,7 +21,7 @@ namespace DotsAtoms.GameObjectViews.Mono
         public void OnViewAttached(EntityManager entityManager, in Entity entity, EntityCommandBuffer commands) { }
         public void OnViewDetached(EntityManager entityManager, in Entity entity, EntityCommandBuffer commands) { }
 
-        public async UniTask OnViewDestroy()
+        public async UniTask OnViewWillDestroy()
         {
             var tasks = new List<UniTask>(Trails.Length);
 
