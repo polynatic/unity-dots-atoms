@@ -14,7 +14,7 @@ namespace DotsAtoms.GameObjectPooling.Extensions
                 return;
             }
 
-            pooledObject.Pool.ReturnToPool(pooledObject);
+            pooledObject.Pool.ReturnToPoolInternal(pooledObject);
         }
     }
 }

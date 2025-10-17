@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using DotsAtoms.GameObjectPooling.Interfaces;
 using DotsAtoms.GameObjectViews.Interfaces;
 using Unity.Entities;
 using UnityEngine;
@@ -9,7 +10,7 @@ using static Cysharp.Threading.Tasks.UniTask;
 
 namespace DotsAtoms.GameObjectViews.Mono
 {
-    public class GameObjectViewDestroyAwaitTrails : MonoBehaviour, IGameObjectView
+    public class GameObjectViewDestroyAwaitTrails : MonoBehaviour, IGameObjectView, IPooledMonoBehaviour
     {
         private TrailRenderer[] Trails;
 
@@ -42,6 +43,13 @@ namespace DotsAtoms.GameObjectViews.Mono
         {
             while (trail.positionCount > 0) {
                 await NextFrame(cancellationToken: destroyCancellationToken);
+            }
+        }
+
+        public void OnReturnedToPool()
+        {
+            foreach (var trail in Trails) {
+                trail.emitting = true;
             }
         }
     }

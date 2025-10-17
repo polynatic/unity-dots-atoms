@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using DotsAtoms.GameObjectPooling.Interfaces;
 using DotsAtoms.GameObjectViews.Interfaces;
 using Unity.Entities;
 using UnityEngine;
@@ -9,9 +10,10 @@ using static Cysharp.Threading.Tasks.UniTask;
 
 namespace DotsAtoms.GameObjectViews.Mono
 {
-    public class GameObjectViewDestroyAwaitParticles : MonoBehaviour, IGameObjectView
+    public class GameObjectViewDestroyAwaitParticles : MonoBehaviour, IGameObjectView, IPooledMonoBehaviour
     {
         private ParticleSystem[] ParticleSystems;
+        private bool[] PlayOnAwake;
 
         private void Awake()
         {
@@ -32,9 +34,16 @@ namespace DotsAtoms.GameObjectViews.Mono
                 }
             }
 
-            if (subEmitters.Count == 0) return;
+            if (subEmitters.Count > 0) {
+                ParticleSystems = ParticleSystems.Except(subEmitters).ToArray();
+            }
 
-            ParticleSystems = ParticleSystems.Except(subEmitters).ToArray();
+            // remember all play on awake settings to restore play state after pooling
+            PlayOnAwake = new bool[ParticleSystems.Length];
+
+            for (var i = 0; i < ParticleSystems.Length; i++) {
+                PlayOnAwake[i] = ParticleSystems[i].main.playOnAwake;
+            }
         }
 
         public void OnViewAttached(EntityManager entityManager, in Entity entity, EntityCommandBuffer commands) { }
@@ -61,6 +70,15 @@ namespace DotsAtoms.GameObjectViews.Mono
         {
             while (system.IsAlive(withChildren: true)) {
                 await NextFrame(cancellationToken: destroyCancellationToken);
+            }
+        }
+
+        public void OnReturnedToPool()
+        {
+            for (var i = 0; i < ParticleSystems.Length; i++) {
+                if (!PlayOnAwake[i]) continue;
+
+                ParticleSystems[i].Play();
             }
         }
     }

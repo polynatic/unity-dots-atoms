@@ -31,8 +31,6 @@ namespace DotsAtoms.GameObjectPooling.Mono
             ProcessedPrewarmContainers = new(); // Container : Processed by parent
 
 
- 
-
         private void PrewarmPools()
         {
             ProcessedPrewarmContainers.Clear();
@@ -78,7 +76,7 @@ namespace DotsAtoms.GameObjectPooling.Mono
                         Pools.Add(prefab.GetInstanceID(), pool);
 
                         for (var i = 0; i < poolingConfig.Count; i++) {
-                            ReturnToPool(InstantiateFromPrefab(prefab));
+                            ReturnToPoolInternal(InstantiateFromPrefab(prefab), isInstantiating: true);
                         }
 
                         continue;
@@ -98,7 +96,7 @@ namespace DotsAtoms.GameObjectPooling.Mono
         }
 
 
-        private GameObject InstantiateFromPrefab(GameObject prefab)
+        private PooledGameObject InstantiateFromPrefab(GameObject prefab)
         {
             var instance = Instantiate(prefab);
             var pooled = instance.GetComponent<PooledGameObject>() ?? instance.AddComponent<PooledGameObject>();
@@ -107,7 +105,7 @@ namespace DotsAtoms.GameObjectPooling.Mono
 #if UNITY_EDITOR
             instance.name = prefab.name;
 #endif
-            return instance;
+            return pooled;
         }
 
 
@@ -118,7 +116,7 @@ namespace DotsAtoms.GameObjectPooling.Mono
                     $"Prefab {prefab.name} is not pooled yet. Consider adding it to Prewarm Prefabs.",
                     prefab
                 );
-                return InstantiateFromPrefab(prefab);
+                return InstantiateFromPrefab(prefab).gameObject;
             }
 
             var pooledInstances = pool.PooledInstances;
@@ -135,13 +133,13 @@ namespace DotsAtoms.GameObjectPooling.Mono
                 return instance;
             }
 
-            return InstantiateFromPrefab(prefab);
+            return InstantiateFromPrefab(prefab).gameObject;
         }
 
         public void ReturnToPool(GameObject pooledObject) => pooledObject.ReturnToPool();
 
 
-        internal void ReturnToPool(PooledGameObject pooledObject)
+        internal void ReturnToPoolInternal(PooledGameObject pooledObject, bool isInstantiating = false)
         {
             var prefab = pooledObject.Prefab;
 
@@ -159,7 +157,10 @@ namespace DotsAtoms.GameObjectPooling.Mono
 #if UNITY_EDITOR
             instance.transform.SetParent(pool.PoolParent.transform, false);
 #endif
-            pooledObject.OnReturnedToPool();
+
+            if (!isInstantiating) {
+                pooledObject.OnReturnedToPool();
+            }
         }
     }
 }
