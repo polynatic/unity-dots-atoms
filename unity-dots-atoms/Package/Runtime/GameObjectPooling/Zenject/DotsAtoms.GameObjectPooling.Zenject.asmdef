@@ -1,0 +1,25 @@
+{
+  "name": "DotsAtoms.GameObjectPooling.Zenject",
+  "rootNamespace": "DotsAtoms.GameObjectPooling.Zenject",
+  "references": [
+    "GUID:4e99d73647b847cd8b691bbc83038253",
+    "Zenject"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [
+    "DOTS_ATOMS_DEPENDENCY_ZENJECT"
+  ],
+  "versionDefines": [
+    {
+      "name": "com.mathijsbakker.extenject",
+      "expression": "9.2.0",
+      "define": "DOTS_ATOMS_DEPENDENCY_ZENJECT"
+    }
+  ],
+  "noEngineReferences": false
+}
