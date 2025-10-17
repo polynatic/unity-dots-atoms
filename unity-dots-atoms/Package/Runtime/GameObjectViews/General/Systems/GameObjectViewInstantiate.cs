@@ -16,12 +16,12 @@ namespace DotsAtoms.GameObjectViews.Systems
     public partial struct GameObjectViewInstantiate : ISystem
     {
         private EcbSystemType.Singleton EcbSystem;
-        private Data.GameObjectView.Singleton GameObjectViewSingleton;
+        private GameObjectView.Singleton GameObjectViewSingleton;
 
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<EcbSystemType.Singleton>();
-            state.RequireForUpdate<Data.GameObjectView.Singleton>();
+            state.RequireForUpdate<GameObjectView.Singleton>();
             EcbSystem = GetSingleton<EcbSystemType.Singleton>();
 
             var context = Object.FindFirstObjectByType<Mono.GameObjectViewContext>();
@@ -79,7 +79,7 @@ namespace DotsAtoms.GameObjectViews.Systems
                 commands.AddComponent<GameObjectView.IsAlive>(entity);
                 commands.RemoveComponent<GameObjectView.Prefab>(entity);
 
-                instantiated.View.OnViewAttached(state.EntityManager, entity, commands);
+                instantiated.View.OnViewAttached(entity, commands);
             }
         }
     }

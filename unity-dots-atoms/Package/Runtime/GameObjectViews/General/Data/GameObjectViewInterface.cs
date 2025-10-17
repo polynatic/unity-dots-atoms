@@ -29,18 +29,14 @@ namespace DotsAtoms.GameObjectViews.Data
                 }
             }
 
-            public void OnViewAttached(EntityManager entityManager, in Entity entity, EntityCommandBuffer commands)
+            public void OnViewAttached(in Entity entity, EntityCommandBuffer commands)
             {
                 if (Instance == null) return;
 
                 commands.AddComponent(entity, new GameObjectViewInterface<T> { Value = Instance });
             }
 
-            public void OnViewDetached(
-                EntityManager entityManager,
-                in Entity entity,
-                EntityCommandBuffer commands
-            )
+            public void OnViewDetached(in Entity entity, EntityCommandBuffer commands)
             {
                 commands.RemoveComponent<GameObjectViewInterface<T>>(entity);
             }

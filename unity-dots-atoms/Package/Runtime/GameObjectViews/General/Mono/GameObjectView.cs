@@ -26,18 +26,18 @@ namespace DotsAtoms.GameObjectViews.Mono
         }
 
 
-        public void OnViewAttached(EntityManager entityManager, in Entity entity, EntityCommandBuffer commands)
+        public void OnViewAttached(in Entity entity, EntityCommandBuffer commands)
         {
             foreach (var view in ViewComponents) {
-                view.OnViewAttached(entityManager, entity, commands);
+                view.OnViewAttached(entity, commands);
             }
         }
 
-        public void OnViewDetached(EntityManager entityManager, in Entity entity, EntityCommandBuffer commands)
+        public void OnViewDetached(in Entity entity, EntityCommandBuffer commands)
         {
             var tasks = new List<UniTask>();
             foreach (var view in ViewComponents) {
-                view.OnViewDetached(entityManager, entity, commands);
+                view.OnViewDetached(entity, commands);
                 tasks.Add(view.OnViewWillDestroy());
             }
 

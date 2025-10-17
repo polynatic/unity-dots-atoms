@@ -8,16 +8,24 @@ namespace DotsAtoms.GameObjectViews.Interfaces
         /// <summary>
         /// Called when the view is attached to an entity. Provides a command buffer from
         /// EndSimulationEntityCommandBufferSystem for avoiding an immediate structural change.
+        /// 
+        /// For performance reasons, avoid calling EntityManager functions directly from this callback, as it will
+        /// create a full sync point and complete all jobs even unrelated to the data you read. Instead, create a system
+        /// and query only the exact data you need and update your view game object from there.
         /// </summary>
-        void OnViewAttached(EntityManager entityManager, in Entity entity, EntityCommandBuffer commands) { }
+        void OnViewAttached(in Entity entity, EntityCommandBuffer commands) { }
 
         /// <summary>
         /// Called when the view is detached from an entity. Provides a command buffer from
         /// EndSimulationEntityCommandBufferSystem for avoiding an immediate structural change.
         /// After the view has been detached, it will be destroyed. If you want to delay destruction, implement
         /// OnViewDestroy and return a task that waits for the condition when it can be destroyed.
+        /// 
+        /// For performance reasons, avoid calling EntityManager functions directly from this callback, as it will
+        /// create a full sync point and complete all jobs even unrelated to the data you read. Instead, create a system
+        /// and query only the exact data you need and update your view game object from there.
         /// </summary>
-        void OnViewDetached(EntityManager entityManager, in Entity entity, EntityCommandBuffer commands) { }
+        void OnViewDetached(in Entity entity, EntityCommandBuffer commands) { }
 
         /// <summary>
         /// Called before the view game object is destroyed or otherwise becomes unavailable (pooling) after the entity

@@ -1,10 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using DotsAtoms.GameObjectPooling.Interfaces;
 using DotsAtoms.GameObjectViews.Interfaces;
-using Unity.Entities;
 using UnityEngine;
 using static Cysharp.Threading.Tasks.UniTask;
 
@@ -46,8 +44,6 @@ namespace DotsAtoms.GameObjectViews.Mono
             }
         }
 
-        public void OnViewAttached(EntityManager entityManager, in Entity entity, EntityCommandBuffer commands) { }
-        public void OnViewDetached(EntityManager entityManager, in Entity entity, EntityCommandBuffer commands) { }
 
         public async UniTask OnViewWillDestroy()
         {
