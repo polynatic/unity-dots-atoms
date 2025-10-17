@@ -47,11 +47,6 @@ namespace DotsAtoms.GameObjectViews.Mono
         private async UniTaskVoid DestroyAfterTasks(List<UniTask> tasks)
         {
             await tasks;
-
-            foreach (var view in ViewComponents) {
-                view.OnViewDestroyed();
-            }
-
             Context.DestroyView(this);
         }
     }

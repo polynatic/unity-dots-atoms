@@ -25,10 +25,5 @@ namespace DotsAtoms.GameObjectViews.Interfaces
         /// system on the view to finish all particles.
         /// </summary>
         UniTask OnViewWillDestroy() => default;
-
-        /// <summary>
-        /// Called right before the view is destroyed. If the view is pooled, you can use this to reset all values.
-        /// </summary>
-        void OnViewDestroyed() { }
     }
 }

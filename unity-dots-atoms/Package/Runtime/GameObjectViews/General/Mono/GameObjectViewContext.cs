@@ -31,16 +31,16 @@ namespace DotsAtoms.GameObjectViews.Mono
         }
 
 
-        [MenuItem("GameObject/DotsAtoms/GameObjectView Context", false, 10)]
-        static void CreateGameObjectViewContext(MenuCommand menu)
+        [MenuItem("GameObject/DotsAtoms/GameObjectViewContext/Plain", false, 10)]
+        public static void CreateGameObjectViewContext(MenuCommand menu)
         {
-            var go = new GameObject("GameObjectView Context");
-            go.AddComponent<GameObjectViewContext>();
+            var gameObject = new GameObject("GameObjectViewContext");
+            gameObject.AddComponent<GameObjectViewContext>();
 
             // ensure proper parenting when right-clicking on an object
-            GameObjectUtility.SetParentAndAlign(go, menu.context as GameObject);
-            Undo.RegisterCreatedObjectUndo(go, "Create GameObjectView Context");
-            Selection.activeObject = go;
+            GameObjectUtility.SetParentAndAlign(gameObject, menu.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(gameObject, "Create GameObjectView Context");
+            Selection.activeObject = gameObject;
         }
     }
 }
