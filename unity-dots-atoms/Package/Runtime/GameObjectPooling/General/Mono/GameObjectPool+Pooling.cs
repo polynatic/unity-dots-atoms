@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using DotsAtoms.GameObjectPooling.Extensions;
 using UnityEngine;
@@ -8,13 +7,6 @@ namespace DotsAtoms.GameObjectPooling.Mono
 {
     public partial class GameObjectPool
     {
-        [Serializable]
-        public struct PrewarmConfig
-        {
-            public Object Prefab;
-            public int Count;
-        }
-
         private class Pool
         {
             public readonly List<GameObject> PooledInstances = new();
@@ -23,9 +15,8 @@ namespace DotsAtoms.GameObjectPooling.Mono
 #endif
         }
 
-        [SerializeField] private List<PrewarmConfig> PrewarmPrefabs;
 
-        private readonly Dictionary<int, Pool> Pools = new(); // int is GetInstanceID()
+        private readonly Dictionary<int, Pool> Pools = new(); // int is GetInstanceID() of prefab
 
         private readonly Dictionary<Object, Object>
             ProcessedPrewarmContainers = new(); // Container : Processed by parent
