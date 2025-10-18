@@ -7,7 +7,7 @@ using UnityEngine.Jobs;
 
 namespace DotsAtoms.GameObjectViews.Data
 {
-    public struct GameObjectView : ICleanupComponentData
+    public partial struct GameObjectView : ICleanupComponentData
     {
         private UnityObjectRef<GameObject> GameObjectRef;
         private UnityObjectRef<Mono.GameObjectView> GameObjectViewRef;
@@ -20,44 +20,11 @@ namespace DotsAtoms.GameObjectViews.Data
         /// </summary>
         public struct OnViewAttached : IComponentData, IEnableableComponent { }
 
-        public struct Prefab : IComponentData
-        {
-            private UnityObjectRef<GameObject> Reference;
-
-            // ReSharper disable once InconsistentNaming
-            public readonly bool HasRigidBody;
-
-            public Prefab(GameObject gameObject)
-            {
-                Reference = new() { Value = gameObject };
-                HasRigidBody = gameObject.GetComponent<Rigidbody>();
-            }
-
-            [Pure]
-            public GameObjectView Instantiate(GameObjectViewContext context)
-            {
-                var view = InstantiateInternal(context);
-                return new() {
-                    GameObjectRef = view.gameObject,
-                    GameObjectViewRef = view,
-                };
-            }
-
-            private Mono.GameObjectView InstantiateInternal(GameObjectViewContext context)
-            {
-                var prefab = Reference.Value.gameObject;
-                var view = context.InstantiateViewInternal(prefab);
-#if UNITY_EDITOR
-                view.gameObject.name = prefab.name;
-#endif
-                return view;
-            }
-        }
-
         /// <summary>
         /// As long as this component is on an entity with a GameObjectView, the GameObjectView will not be cleaned up.
         /// </summary>
         public struct IsAlive : IComponentData { }
+
 
         public struct Singleton : IComponentData
         {
@@ -67,7 +34,8 @@ namespace DotsAtoms.GameObjectViews.Data
             public UnityObjectRef<GameObjectViewContext> Context;
 
             /// <summary>
-            /// This map contains all references to views with RigidBodies and the entities from where they update the velocity from.
+            /// This map contains all references to views with RigidBodies and the entities from where they update
+            /// the velocity from.
             /// </summary>
             public NativeHashMap<UnityObjectRef<Rigidbody>, Entity> RigidBodies;
         }

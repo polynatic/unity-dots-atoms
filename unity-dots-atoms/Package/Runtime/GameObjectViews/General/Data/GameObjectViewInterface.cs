@@ -1,4 +1,3 @@
-using Cysharp.Threading.Tasks;
 using DotsAtoms.GameObjectViews.Interfaces;
 using Unity.Entities;
 using UnityEngine;
@@ -9,6 +8,11 @@ namespace DotsAtoms.GameObjectViews.Data
     public class GameObjectViewInterface<T> : IComponentData
     {
         public T Value;
+
+        public GameObjectViewInterface() { }
+
+        public GameObjectViewInterface(T value) => new GameObjectViewInterface<T> { Value = value };
+
 
         public class FromScene : MonoBehaviour, IGameObjectView
         {
