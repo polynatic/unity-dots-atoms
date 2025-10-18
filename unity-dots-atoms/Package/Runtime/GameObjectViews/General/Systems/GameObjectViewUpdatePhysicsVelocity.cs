@@ -1,12 +1,9 @@
 using DotsAtoms.GameObjectViews.Data;
 using Extensions.Entities;
 using Unity.Burst;
-using Unity.Collections;
 using Unity.Entities;
 using Unity.Physics;
 using Unity.Rendering;
-using Unity.Transforms;
-using UnityEngine.Jobs;
 using static Unity.Entities.SystemAPI;
 
 namespace DotsAtoms.GameObjectViews.Systems

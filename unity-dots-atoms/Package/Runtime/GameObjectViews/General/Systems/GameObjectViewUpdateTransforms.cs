@@ -18,6 +18,7 @@ namespace DotsAtoms.GameObjectViews.Systems
         private GameObjectView.Singleton GameObjectViewSingleton;
         private ComponentLookup<LocalToWorld> LookupLocalTransform;
 
+        [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<GameObjectView.Singleton>();
@@ -48,6 +49,7 @@ namespace DotsAtoms.GameObjectViews.Systems
             [ReadOnly, NativeDisableParallelForRestriction]
             public NativeList<Entity> Entities;
 
+            [BurstCompile]
             public void Execute(int index, TransformAccess transform)
             {
                 var entity = Entities[index];

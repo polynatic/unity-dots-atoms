@@ -15,15 +15,16 @@ namespace DotsAtoms.GameObjectViews.Authoring
         [Tooltip("Assign a prefab that should be instantiated and used as a view for this entity.")]
         private GameObjectView Prefab;
 
+        public Data.GameObjectView.Prefab AsComponent => new Data.GameObjectView.Prefab(Prefab.gameObject);
+
         private class Baker : Baker<GameObjectViewPrefab>
         {
             public override void Bake(GameObjectViewPrefab authoring)
             {
                 var entity = GetEntity(TransformUsageFlags.None);
-                AddComponent(
-                    entity,
-                    new Data.GameObjectView.Prefab(authoring.Prefab.gameObject)
-                );
+                AddComponent(entity, authoring.AsComponent);
+                AddComponent<Data.GameObjectView.OnViewAttached>(entity);
+                SetComponentEnabled<Data.GameObjectView.OnViewAttached>(entity, false);
             }
         }
     }

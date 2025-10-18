@@ -78,6 +78,7 @@ namespace DotsAtoms.GameObjectViews.Systems
                 commands.AddComponent(entity, instantiated);
                 commands.AddComponent<GameObjectView.IsAlive>(entity);
                 commands.RemoveComponent<GameObjectView.Prefab>(entity);
+                commands.SetComponentEnabled<GameObjectView.OnViewAttached>(entity, true);
 
                 instantiated.View.OnViewAttached(entity, commands);
             }

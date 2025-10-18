@@ -15,6 +15,10 @@ namespace DotsAtoms.GameObjectViews.Data
         public GameObject GameObject => GameObjectRef.Value.gameObject;
         public Mono.GameObjectView View => GameObjectViewRef.Value;
 
+        /// <summary>
+        /// Enabled on the frame the GameObjectView has been attached to the entity.
+        /// </summary>
+        public struct OnViewAttached : IComponentData, IEnableableComponent { }
 
         public struct Prefab : IComponentData
         {
