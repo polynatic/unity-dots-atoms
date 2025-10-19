@@ -145,31 +145,34 @@ In case you need to access the singleton directly, a convenience method is provi
 
 public partial struct MyRandomSystem : ISystem
 {
-    private Randomness.Singleton.Query Randomness; // Store query for singleton
+    private Randomness.Singleton.Query RandomnessSingleton; // Store query for singleton
 
     public void OnCreate(ref SystemState state)
     {
-        Randomness.UseSystemState(ref state); // Initialize query for singleton
+        RandomnessSingleton.UseSystemState(ref state); // Initialize query for singleton
     }
 
     public void OnUpdate(ref SystemState state)
     {
-        ref var random = ref Randomness.GetRandomRW(ref state); // Get Mathematics.Random ref of singleton
+        RandomnessSingleton.Update(ref state); // Update singleton state
+        
+        ref var randomnes = ref RandomnessSingleton.GetRandomRW(); // Get Mathematics.Random ref of singleton
         var randomInt = random.NextInt(); // Generate something random
 
 
-        // Use "child" randomness to enable jobs, because you can't pass a ref var.
+        // Use randomness singleton inside a job.
         // This doesn't work with parallel jobs, because threads would modify the RNG state in unpredictable orders.
-        new MyJob { Random = random.NextRandom() }.Schedule();
+        new MyJob { RandomnessSingleton = RandomnessSingleton }.Schedule();
     }
 
     private partial struct MyJob : IJobEntity
     {
-        public Unity.Mathematics.Random Random;
+        public Randomness.Singleton.Query RandomnessSingleton;
 
         public void Execute(Entity entity)
         {
-            var randomInt = Random.NextInt(); // Generate something random
+            ref var random = ref RandomnessSingleton.GetRandomRW();
+            var randomInt = random.NextInt(); // Generate something random
         }
     }
 }
