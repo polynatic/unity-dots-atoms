@@ -1,3 +1,4 @@
+using Extensions.Entities;
 using Unity.Collections;
 using Unity.Entities;
 
@@ -31,22 +32,34 @@ namespace DotsAtoms.Random.Data
             /// </summary>
             public struct Query
             {
-                private EntityQuery SingletonQuery;
+                private Entity Entity;
+                private ComponentLookup<Randomness> LookupRandomness;
 
-                public void UseSystemState(ref SystemState state) =>
-                    SingletonQuery = new EntityQueryBuilder(Allocator.Temp)
-                                     .WithAllRW<Randomness, Singleton>()
-                                     .Build(ref state);
+                public void UseSystemState(ref SystemState state)
+                {
+                    LookupRandomness.UseSystemStateReadWrite(ref state);
+
+                    var query = new EntityQueryBuilder(Allocator.Temp)
+                                .WithAll<Randomness, Singleton>()
+                                .Build(ref state);
+
+                    if (!query.TryGetSingletonEntity<Randomness>(out Entity)) {
+                        throw new(
+                            "Randomness.Singleton entity not found. Add [CreateAfter(typeof(SeedRandomnessFromSingleton))] attribute to your system."
+                        );
+                    }
+                }
+
+                public void Update(ref SystemState state) => LookupRandomness.Update(ref state);
 
                 /// <summary>
                 /// Get the singletons Random value for writing. Any changes due to calling random generation functions will
                 /// automatically be applied to the original component. Don't forget to store it in a ref variable, or
                 /// changes will not be applied!
                 /// </summary>
-                public ref Unity.Mathematics.Random GetRandomRW(ref SystemState state)
+                public ref Unity.Mathematics.Random GetRandomRW()
                 {
-                    var randomness = SingletonQuery.GetSingletonRW<Randomness>();
-                    return ref randomness.ValueRW.Value;
+                    return ref LookupRandomness.GetRefRW(Entity).ValueRW.Value;
                 }
             }
         }

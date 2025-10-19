@@ -1,5 +1,6 @@
 using DotsAtoms.Random.Data;
 using Unity.Burst;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -47,24 +48,42 @@ namespace DotsAtoms.Random.Systems
         }
 
         [BurstCompile]
-        public void OnUpdate(ref SystemState state) =>
-            new Job {
-                Random = RandomnessSingleton.GetRandomRW(ref state).NextRandom(),
+        public void OnUpdate(ref SystemState state)
+        {
+            RandomnessSingleton.Update(ref state);
+
+            state.Dependency = new Job {
+                EntityType = GetEntityTypeHandle(),
+                RandomnessSingleton = RandomnessSingleton,
                 Commands = EcbSystem.CreateCommandBuffer(state.WorldUnmanaged),
-            }.Schedule(Query);
+            }.Schedule(Query, state.Dependency);
+        }
 
 
         [BurstCompile]
-        private partial struct Job : IJobEntity
+        private struct Job : IJobChunk
         {
-            public Unity.Mathematics.Random Random;
+            public Randomness.Singleton.Query RandomnessSingleton;
             public EntityCommandBuffer Commands;
 
+            [ReadOnly] public EntityTypeHandle EntityType;
+
             [BurstCompile]
-            public void Execute(in Entity entity)
+            public void Execute(
+                in ArchetypeChunk chunk,
+                int unfilteredChunkIndex,
+                bool useEnabledMask,
+                in v128 chunkEnabledMask
+            )
             {
-                Commands.AddComponent(entity, Random.NextRandomness());
-                Commands.RemoveComponent<Randomness.SeedFromSingleton>(entity);
+                var randomness = RandomnessSingleton.GetRandomRW().NextRandomness();
+                var entities = chunk.GetNativeArray(EntityType);
+
+                for (var i = 0; i < chunk.Count; i++) {
+                    var entity = entities[i];
+                    Commands.AddComponent(entity, randomness.NextRandomness());
+                    Commands.RemoveComponent<Randomness.SeedFromSingleton>(entity);
+                }
             }
         }
     }
