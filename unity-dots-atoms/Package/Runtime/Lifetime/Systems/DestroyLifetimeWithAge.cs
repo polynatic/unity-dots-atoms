@@ -1,5 +1,4 @@
 using Unity.Burst;
-using Unity.Collections;
 using Unity.Entities;
 using static DotsAtoms.Lifetime.Data.Lifetime;
 using static Unity.Entities.SystemAPI;
