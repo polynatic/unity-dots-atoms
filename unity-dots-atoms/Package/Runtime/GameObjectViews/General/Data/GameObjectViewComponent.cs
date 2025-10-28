@@ -13,6 +13,7 @@ namespace DotsAtoms.GameObjectViews.Data
         private readonly UnityObjectRef<T> Reference;
 
         public GameObjectViewComponent(UnityObjectRef<T> reference) => Reference = reference;
+        public static implicit operator GameObjectViewComponent<T>(T reference) => new(reference);
 
         public T Value => Reference.Value;
     }
