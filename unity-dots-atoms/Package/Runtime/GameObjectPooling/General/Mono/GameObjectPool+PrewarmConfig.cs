@@ -1,25 +1,38 @@
 using System;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
-using static UnityEditor.EditorGUI;
 using Object = UnityEngine.Object;
+
+#if UNITY_EDITOR
+using UnityEditor;
+using static UnityEditor.EditorGUI;
+#endif
 
 namespace DotsAtoms.GameObjectPooling.Mono
 {
     public partial class GameObjectPool
     {
-        [SerializeField] private List<PrewarmConfig> PrewarmPrefabs;
+        [SerializeField] private List<PrewarmConfig> PrewarmPrefabs = new();
 
         [Serializable]
-        public struct PrewarmConfig
+        public class PrewarmConfig
         {
             public Object Prefab;
             public int Count;
+
+            [HideInInspector] public Hash128 PrefabGuid;
         }
 
 
 #if UNITY_EDITOR
+        private void OnValidate()
+        {
+            foreach (var prewarmPrefab in PrewarmPrefabs) {
+                GameObjectPoolPrewarmConfig.MakeSureGuidIsCorrect(this, prewarmPrefab);
+            }
+        }
+
+
         [CustomPropertyDrawer(typeof(PrewarmConfig))]
         private class PrewarmConfigDrawer : PropertyDrawer
         {

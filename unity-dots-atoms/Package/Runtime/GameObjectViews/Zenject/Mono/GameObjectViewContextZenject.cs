@@ -1,8 +1,12 @@
 using DotsAtoms.GameObjectPooling.Zenject.Mono;
 using DotsAtoms.GameObjectViews.Mono;
-using UnityEditor;
 using UnityEngine;
 using Zenject;
+
+#if UNITY_EDITOR
+using UnityEditor;
+
+#endif
 
 namespace DotsAtoms.GameObjectViews.Zenject.Mono
 {
@@ -15,6 +19,7 @@ namespace DotsAtoms.GameObjectViews.Zenject.Mono
 
         public override GameObject InstantiateView(GameObject prefab) => DiContainer.InstantiatePrefab(prefab);
 
+#if UNITY_EDITOR
         [MenuItem("GameObject/DotsAtoms/GameObjectViewContext/Zenject", false, 10)]
         public static void CreateGameObjectViewContextZenject(MenuCommand menu)
         {
@@ -42,5 +47,6 @@ namespace DotsAtoms.GameObjectViews.Zenject.Mono
             Undo.RegisterCreatedObjectUndo(gameObject, "Create GameObjectViewContext (Zenject, Pooled)");
             Selection.activeObject = gameObject;
         }
+#endif
     }
 }

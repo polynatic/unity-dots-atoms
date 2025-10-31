@@ -9,6 +9,7 @@ namespace DotsAtoms.GameObjectPooling.Mono
     {
         private class Pool
         {
+            public GameObject Prefab;
             public readonly List<GameObject> PooledInstances = new();
 #if UNITY_EDITOR
             public GameObject PoolParent;
@@ -16,7 +17,8 @@ namespace DotsAtoms.GameObjectPooling.Mono
         }
 
 
-        private readonly Dictionary<int, Pool> Pools = new(); // int is GetInstanceID() of prefab
+        private readonly Dictionary<GameObject, Pool> Pools = new();
+        private readonly Dictionary<Hash128, Pool> PoolsByGuid = new();
 
         private readonly Dictionary<Object, Object>
             ProcessedPrewarmContainers = new(); // Container : Processed by parent
@@ -59,14 +61,20 @@ namespace DotsAtoms.GameObjectPooling.Mono
                     case GameObject prefab:
                         if (DetectPrewarmAssetDuplicate(prefab, container)) continue;
 
+                        var prefabGuid = poolingConfig.PrefabGuid;
+                        var count = poolingConfig.Count;
+                        Debug.Log($"Prewarming {count} instances of {prefab.name} [{prefabGuid}]");
+
                         var pool = new Pool();
+                        pool.Prefab = prefab;
 #if UNITY_EDITOR
                         pool.PoolParent = new GameObject(prefab.name);
                         pool.PoolParent.transform.SetParent(transform, worldPositionStays: false);
 #endif
-                        Pools.Add(prefab.GetInstanceID(), pool);
+                        Pools.Add(prefab, pool);
+                        PoolsByGuid.Add(prefabGuid, pool);
 
-                        for (var i = 0; i < poolingConfig.Count; i++) {
+                        for (var i = 0; i < count; i++) {
                             ReturnToPoolInternal(InstantiateFromPrefab(prefab), isInstantiating: true);
                         }
 
@@ -99,17 +107,38 @@ namespace DotsAtoms.GameObjectPooling.Mono
             return pooled;
         }
 
+        private GameObject InstantiateInternal(GameObject prefab, Hash128 prefabGuid)
+        {
+            if (!PoolsByGuid.TryGetValue(prefabGuid, out var pool)) {
+                Debug.LogWarning(
+                    $"Prefab {prefab.name}:{prefabGuid} is not pooled yet. Pooled prefabs used by entities with GameObjectViewPrefab must be added to the PrewarmConfig. If you don't need pre-warmed instances, set their number to 0 int the config.",
+                    prefab
+                );
+
+                return InstantiateFromPrefab(prefab).gameObject;
+            }
+
+            return InstantiateFromPool(pool);
+        }
+
 
         private GameObject InstantiateInternal(GameObject prefab)
         {
-            if (!Pools.TryGetValue(prefab.GetInstanceID(), out var pool)) {
+            if (!Pools.TryGetValue(prefab, out var pool)) {
                 Debug.LogWarning(
                     $"Prefab {prefab.name} is not pooled yet. Consider adding it to Prewarm Prefabs.",
                     prefab
                 );
+
+
                 return InstantiateFromPrefab(prefab).gameObject;
             }
 
+            return InstantiateFromPool(pool);
+        }
+
+        private GameObject InstantiateFromPool(Pool pool)
+        {
             var pooledInstances = pool.PooledInstances;
 
             if (pooledInstances.Count > 0) {
@@ -124,8 +153,9 @@ namespace DotsAtoms.GameObjectPooling.Mono
                 return instance;
             }
 
-            return InstantiateFromPrefab(prefab).gameObject;
+            return InstantiateFromPrefab(pool.Prefab).gameObject;
         }
+
 
         public void ReturnToPool(GameObject pooledObject) => pooledObject.ReturnToPool();
 
@@ -134,7 +164,7 @@ namespace DotsAtoms.GameObjectPooling.Mono
         {
             var prefab = pooledObject.Prefab;
 
-            if (!Pools.TryGetValue(prefab.GetInstanceID(), out var pool)) {
+            if (!Pools.TryGetValue(prefab, out var pool)) {
                 Debug.LogError($"Prefab {prefab.name} is not pooled by this pool.", prefab);
                 return;
             }

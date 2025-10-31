@@ -1,5 +1,8 @@
-using UnityEditor;
 using UnityEngine;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace DotsAtoms.GameObjectViews.Mono
 {
@@ -22,15 +25,25 @@ namespace DotsAtoms.GameObjectViews.Mono
         public virtual void DestroyView(GameObjectView view) => Destroy(view.gameObject);
 
 
-        internal GameObjectView InstantiateViewInternal(GameObject prefab)
+        /// <summary>
+        /// Instantiate a GameObjectView from a given prefab.
+        /// </summary>
+        protected virtual GameObject InstantiateView(GameObject prefab, Hash128 prefabGuid) => InstantiateView(prefab);
+
+
+        /// <summary>
+        /// Used internally for GameObjectViewPrefab components for stable identifiers, because UnityObjectRef prefab
+        /// references deviate from the original file during baking.
+        /// </summary>
+        internal GameObjectView InstantiateViewWithGuid(GameObject prefab, Hash128 prefabGuid)
         {
-            var instance = InstantiateView(prefab);
+            var instance = InstantiateView(prefab, prefabGuid);
             var view = instance.GetComponent<GameObjectView>();
             view.Context = this;
             return view;
         }
 
-
+#if UNITY_EDITOR
         [MenuItem("GameObject/DotsAtoms/GameObjectViewContext/Plain", false, 10)]
         public static void CreateGameObjectViewContext(MenuCommand menu)
         {
@@ -42,5 +55,6 @@ namespace DotsAtoms.GameObjectViews.Mono
             Undo.RegisterCreatedObjectUndo(gameObject, "Create GameObjectView Context");
             Selection.activeObject = gameObject;
         }
+#endif
     }
 }

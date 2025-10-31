@@ -1,6 +1,9 @@
 using DotsAtoms.GameObjectPooling.Mono;
-using UnityEditor;
 using UnityEngine;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace DotsAtoms.GameObjectViews.Mono
 {
@@ -17,9 +20,12 @@ namespace DotsAtoms.GameObjectViews.Mono
 
         public override GameObject InstantiateView(GameObject prefab) => Pool.InstantiatePooled(prefab);
 
+        protected override GameObject InstantiateView(GameObject prefab, Hash128 prefabGuid) =>
+            Pool.InstantiatePooledByGuid(prefab, prefabGuid);
+
         public override void DestroyView(GameObjectView view) => Pool.ReturnToPool(view.gameObject);
 
-
+#if UNITY_EDITOR
         [MenuItem("GameObject/DotsAtoms/GameObjectViewContext/Pooled", false, 10)]
         static void CreateGameObjectViewContextPooled(MenuCommand menu)
         {
@@ -34,5 +40,6 @@ namespace DotsAtoms.GameObjectViews.Mono
             Undo.RegisterCreatedObjectUndo(gameObject, "Create GameObjectViewContext (Pooled)");
             Selection.activeObject = gameObject;
         }
+#endif
     }
 }

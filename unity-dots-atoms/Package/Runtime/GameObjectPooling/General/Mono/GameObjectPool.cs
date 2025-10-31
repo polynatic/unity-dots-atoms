@@ -1,27 +1,15 @@
-using System;
-using System.Collections.Generic;
-using DotsAtoms.GameObjectPooling.Extensions;
-using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 
 namespace DotsAtoms.GameObjectPooling.Mono
 {
     public partial class GameObjectPool : MonoBehaviour
     {
-        [MenuItem("GameObject/DotsAtoms/GameObjectPool/Plain", false, 10)]
-        public static void CreateGameObjectPool(MenuCommand menu)
-        {
-            var gameObject = new GameObject("GameObjectPool");
-            gameObject.AddComponent<GameObjectPool>();
-
-            // ensure proper parenting when right-clicking on an object
-            GameObjectUtility.SetParentAndAlign(gameObject, menu.context as GameObject);
-            Undo.RegisterCreatedObjectUndo(gameObject, "Create GameObjectPool");
-            Selection.activeObject = gameObject;
-        }
-
         private void Start() => PrewarmPools();
 
 
@@ -33,7 +21,11 @@ namespace DotsAtoms.GameObjectPooling.Mono
             where T : MonoBehaviour =>
             InstantiateInternal(prefab).GetComponent<T>();
 
+
         public GameObject InstantiatePooled(GameObject prefab) => InstantiateInternal(prefab);
+
+        internal GameObject InstantiatePooledByGuid(GameObject prefab, Hash128 prefabGuid) =>
+            InstantiateInternal(prefab, prefabGuid);
 
 
         #region Custom Instantiate/Destroy
@@ -49,5 +41,19 @@ namespace DotsAtoms.GameObjectPooling.Mono
         public virtual void Destroy(GameObject gameObject) => Object.Destroy(gameObject);
 
         #endregion
+
+#if UNITY_EDITOR
+        [MenuItem("GameObject/DotsAtoms/GameObjectPool/Plain", false, 10)]
+        public static void CreateGameObjectPool(MenuCommand menu)
+        {
+            var gameObject = new GameObject("GameObjectPool");
+            gameObject.AddComponent<GameObjectPool>();
+
+            // ensure proper parenting when right-clicking on an object
+            GameObjectUtility.SetParentAndAlign(gameObject, menu.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(gameObject, "Create GameObjectPool");
+            Selection.activeObject = gameObject;
+        }
+#endif
     }
 }

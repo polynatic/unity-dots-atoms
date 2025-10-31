@@ -1,7 +1,10 @@
 using DotsAtoms.GameObjectPooling.Mono;
-using UnityEditor;
 using UnityEngine;
 using Zenject;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace DotsAtoms.GameObjectPooling.Zenject.Mono
 {
@@ -15,6 +18,7 @@ namespace DotsAtoms.GameObjectPooling.Zenject.Mono
         public override GameObject Instantiate(GameObject prefab) => DiContainer.InstantiatePrefab(prefab);
 
 
+#if UNITY_EDITOR
         [MenuItem("GameObject/DotsAtoms/GameObjectPool/Zenject", false, 10)]
         public static void CreateGameObjectPoolZenject(MenuCommand menu)
         {
@@ -26,5 +30,6 @@ namespace DotsAtoms.GameObjectPooling.Zenject.Mono
             Undo.RegisterCreatedObjectUndo(gameObject, "Create GameObjectPool (Zenject)");
             Selection.activeObject = gameObject;
         }
+#endif
     }
 }
