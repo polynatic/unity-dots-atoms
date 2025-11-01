@@ -63,7 +63,7 @@ namespace DotsAtoms.GameObjectPooling.Mono
 
                         var prefabGuid = poolingConfig.PrefabGuid;
                         var count = poolingConfig.Count;
-                        Debug.Log($"Prewarming {count} instances of {prefab.name} [{prefabGuid}]");
+                        //Debug.Log($"Prewarming {count} instances of [{prefabGuid}] {prefab.name}");
 
                         var pool = new Pool();
                         pool.Prefab = prefab;
