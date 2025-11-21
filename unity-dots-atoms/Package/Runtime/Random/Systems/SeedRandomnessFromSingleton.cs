@@ -3,8 +3,6 @@ using Unity.Burst;
 using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Jobs;
-using UnityEngine;
 using static Unity.Entities.ComponentType;
 using static Unity.Entities.SystemAPI;
 using EcbSystem = Unity.Entities.EndFixedStepSimulationEntityCommandBufferSystem;
