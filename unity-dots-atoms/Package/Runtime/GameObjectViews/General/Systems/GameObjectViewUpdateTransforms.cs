@@ -15,7 +15,6 @@ namespace DotsAtoms.GameObjectViews.Systems
     [BurstCompile]
     public partial struct GameObjectViewUpdateTransforms : ISystem
     {
-        private GameObjectView.Singleton GameObjectViewSingleton;
         private ComponentLookup<LocalToWorld> LookupLocalTransform;
 
         [BurstCompile]
@@ -24,20 +23,19 @@ namespace DotsAtoms.GameObjectViews.Systems
             state.RequireForUpdate<GameObjectView.Singleton>();
 
             LookupLocalTransform.UseSystemStateReadOnly(ref state);
-
-            TryGetSingleton(out GameObjectViewSingleton);
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             LookupLocalTransform.Update(ref state);
+            var singleton = GetSingleton<GameObjectView.Singleton>();
 
             state.Dependency = new Job {
                     LookupLocalToWorld = LookupLocalTransform,
-                    Entities = GameObjectViewSingleton.Entities,
+                    Entities = singleton.Entities,
                 }
-                .Schedule(GameObjectViewSingleton.Transforms, state.Dependency);
+                .Schedule(singleton.Transforms, state.Dependency);
         }
 
         [BurstCompile]

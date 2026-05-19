@@ -16,47 +16,32 @@ namespace DotsAtoms.GameObjectViews.Systems
     public partial struct GameObjectViewInstantiate : ISystem
     {
         private EcbSystemType.Singleton EcbSystem;
-        private GameObjectView.Singleton GameObjectViewSingleton;
+
+        private int FramesWithoutSingleton;
+        private const int FramesWithoutSingletonWarning = 60;
+
 
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<EcbSystemType.Singleton>();
-            state.RequireForUpdate<GameObjectView.Singleton>();
             EcbSystem = GetSingleton<EcbSystemType.Singleton>();
-
-            var context = Object.FindFirstObjectByType<Mono.GameObjectViewContext>();
-
-            if (context == null) {
-                Debug.LogWarning($"{nameof(GameObjectViewInstantiate)} requires a GameObjectViewContext");
-                return;
-            }
-
-            GameObjectViewSingleton = new() {
-                Transforms = new(128),
-                Entities = new(Allocator.Persistent),
-                RigidBodies = new(128, Allocator.Persistent),
-                Context = context,
-            };
-
-            state.EntityManager.CreateSingleton(GameObjectViewSingleton);
         }
 
 
         public void OnDestroy(ref SystemState state)
         {
-            if (!TryGetSingleton(out GameObjectViewSingleton)) return;
+            if (!TryGetSingleton<GameObjectView.Singleton>(out var singleton)) return;
 
-            GameObjectViewSingleton.Transforms.Dispose();
-            GameObjectViewSingleton.Entities.Dispose();
+            singleton.Transforms.Dispose();
+            singleton.Entities.Dispose();
         }
 
         public void OnUpdate(ref SystemState state)
         {
+            if (!TryCreateSingleton(ref state, ref FramesWithoutSingleton, out var gameObjectViewSingleton)) return;
+
             var commands = EcbSystem.CreateCommandBuffer(state.WorldUnmanaged);
-            var transforms = GameObjectViewSingleton.Transforms;
-            var entities = GameObjectViewSingleton.Entities;
-            var rigidBodies = GameObjectViewSingleton.RigidBodies;
-            var context = GameObjectViewSingleton.Context.Value;
+            ref var singleton = ref gameObjectViewSingleton.ValueRW;
 
             foreach (
                 var (gameObjectView, entity)
@@ -64,15 +49,15 @@ namespace DotsAtoms.GameObjectViews.Systems
                    .WithNone<GameObjectView>()
                    .WithEntityAccess()
             ) {
-                var instantiated = gameObjectView.ValueRO.Instantiate(context);
+                var instantiated = gameObjectView.ValueRO.Instantiate(singleton.Context);
                 var gameObject = instantiated.GameObject;
                 var hasRigidBody = gameObjectView.ValueRO.HasRigidBody;
 
-                transforms.Add(gameObject.transform);
-                entities.Add(entity);
+                singleton.Transforms.Add(gameObject.transform);
+                singleton.Entities.Add(entity);
 
                 if (hasRigidBody) {
-                    rigidBodies.Add(gameObject.GetComponent<Rigidbody>(), entity);
+                    singleton.RigidBodies.Add(gameObject.GetComponent<Rigidbody>(), entity);
                 }
 
                 commands.AddComponent(entity, instantiated);
@@ -82,6 +67,37 @@ namespace DotsAtoms.GameObjectViews.Systems
 
                 instantiated.View.OnViewAttached(entity, commands);
             }
+        }
+
+        private bool TryCreateSingleton(
+            ref SystemState state,
+            ref int frameCounter,
+            out RefRW<GameObjectView.Singleton> singleton
+        )
+        {
+            if (TryGetSingletonRW(out singleton)) return true;
+
+            var context = Object.FindFirstObjectByType<Mono.GameObjectViewContext>();
+
+            if (context == null) {
+                if (frameCounter == -1) return false;
+                if (frameCounter++ < FramesWithoutSingletonWarning) return false;
+
+                Debug.LogWarning($"{nameof(GameObjectViewInstantiate)} requires a GameObjectViewContext");
+                FramesWithoutSingleton = -1; // stop trying
+                return false;
+            }
+
+            state.EntityManager.CreateSingleton(
+                new GameObjectView.Singleton {
+                    Transforms = new(128),
+                    Entities = new(Allocator.Persistent),
+                    RigidBodies = new(128, Allocator.Persistent),
+                    Context = context,
+                }
+            );
+
+            return TryGetSingletonRW(out singleton);
         }
     }
 }

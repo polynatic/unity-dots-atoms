@@ -28,11 +28,8 @@ namespace DotsAtoms.GameObjectViews.Systems
 
         public void OnUpdate(ref SystemState state)
         {
-            var singleton = GetSingleton<GameObjectView.Singleton>();
+            ref var singleton = ref GetSingletonRW<GameObjectView.Singleton>().ValueRW;
             var commands = EcbSystem.CreateCommandBuffer(state.WorldUnmanaged);
-            var transforms = singleton.Transforms;
-            var entities = singleton.Entities;
-            var rigidBodies = singleton.RigidBodies;
 
             foreach (
                 var (gameObjectView, entity)
@@ -40,11 +37,11 @@ namespace DotsAtoms.GameObjectViews.Systems
                    .WithNone<GameObjectView.IsAlive>()
                    .WithEntityAccess()
             ) {
-                var index = entities.IndexOf(entity);
-                transforms.RemoveAtSwapBack(index);
-                entities.RemoveAtSwapBack(index);
+                var index = singleton.Entities.IndexOf(entity);
+                singleton.Transforms.RemoveAtSwapBack(index);
+                singleton.Entities.RemoveAtSwapBack(index);
 
-                rigidBodies.Remove(gameObjectView.ValueRO.GameObject.GetComponent<Rigidbody>());
+                singleton.RigidBodies.Remove(gameObjectView.ValueRO.GameObject.GetComponent<Rigidbody>());
                 commands.RemoveComponent<GameObjectView>(entity);
 
                 gameObjectView.ValueRO.View.OnViewDetached(entity, commands);

@@ -14,7 +14,6 @@ namespace DotsAtoms.GameObjectViews.Systems
     [BurstCompile]
     public partial struct GameObjectViewUpdatePhysicsVelocity : ISystem
     {
-        private GameObjectView.Singleton GameObjectViewSingleton;
         private ComponentLookup<PhysicsVelocity> LookupPhysicsVelocity;
 
         public void OnCreate(ref SystemState state)
@@ -22,8 +21,6 @@ namespace DotsAtoms.GameObjectViews.Systems
             state.RequireForUpdate<GameObjectView.Singleton>();
 
             LookupPhysicsVelocity.UseSystemStateReadOnly(ref state);
-
-            TryGetSingleton(out GameObjectViewSingleton);
         }
 
         public void OnUpdate(ref SystemState state)
@@ -32,7 +29,9 @@ namespace DotsAtoms.GameObjectViews.Systems
 
             state.Dependency.Complete();
 
-            foreach (var kv in GameObjectViewSingleton.RigidBodies) {
+            var singleton = GetSingleton<GameObjectView.Singleton>();
+
+            foreach (var kv in singleton.RigidBodies) {
                 var entity = kv.Value;
                 var rigidBody = kv.Key.Value;
                 var physicsVelocity = LookupPhysicsVelocity[entity];
