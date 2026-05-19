@@ -101,8 +101,8 @@ private partial struct Job : IJobEntity
 }
 ```
 
-If an entity is spawned by another entity, the _Randomness_ needs to be passed on as seed to the newly spawned
-entity by the spawner. This can also happen in parallel jobs, as each entity has their own _Randomness_.
+If an entity is spawned by another entity, parent _Randomness_ should be passed on as the seed to the newly spawned
+entity. This is also possible from parallel jobs, as each spawner entity has their own _Randomness_.
 
 ```csharp
 // Example for spawning from an entity
@@ -116,7 +116,9 @@ foreach (var (spawner, randomness) in Query<RefRO<Spawner>, RefRW<Randomness>>()
 ```
 
 Entities that are not spawned from a "parent" need to be seeded by the singleton. This can be done by adding a
-_Randomness.SeedFromSingleton_ component. It will be replaced with a seeded _Randomness_ component when after the
+_Randomness.SeedFromSingleton_ component. It will be replaced with a seeded _Randomness_ component after the
+_SeedRandomnessFromSingleton_ system ran. Do __NOT__ add a plain _Randomness_ component if you want a seed from the
+singleton, otherwise your system might execute with an unseeded component and throw an error. __Only add one of both.__
 
 ```csharp
 // Example baking code for Randomness that is seeded by the global Randomness singleton
@@ -131,11 +133,10 @@ public class Baker : Baker<MyAuthoringComponent>
 }
 ```
 
-The singleton cannot be used in parallel jobs which makes this a little less efficient. Also, this _Randomness_ is only
-seeded after the _SeedRandomnessFromSingleton_ system ran, so you need to be aware of that and schedule your systems
-after. It also creates structural changes to replace the _SeedFromSingleton_ component which reduces efficiency even
-more.
-Because of this, it's recommended to use per entity _Randomness_ where possible, as it doesn't have these limitations
+The singleton cannot be used in parallel jobs which makes this a little less efficient. It also creates structural
+changes to replace the _SeedFromSingleton_ component which reduces efficiency even
+more. Because of this, it's recommended to use per entity _Randomness_ where possible, as it doesn't have these
+limitations
 and is most efficient.
 
 In case you need to access the singleton directly, a convenience method is provided.
