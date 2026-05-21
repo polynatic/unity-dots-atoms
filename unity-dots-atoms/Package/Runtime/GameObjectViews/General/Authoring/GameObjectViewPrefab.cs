@@ -21,6 +21,8 @@ namespace DotsAtoms.GameObjectViews.Authoring
         {
             public override void Bake(GameObjectViewPrefab authoring)
             {
+                if (authoring.Prefab == null) return;
+
                 var entity = GetEntity(TransformUsageFlags.None);
                 AddComponent(entity, authoring.AsComponent);
                 AddComponent<Data.GameObjectView.OnViewAttached>(entity);
